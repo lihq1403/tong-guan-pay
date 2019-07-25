@@ -1,0 +1,23 @@
+{
+    "name": "lihq1403\/tong-guan-pay",
+    "description": "tong guan pay",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lihq1403",
+            "email": "lihaiqing1994@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "ext-json": "*",
+        "ext-simplexml":"*",
+        "ext-libxml":"*",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lihq1403\\TongGuanPay\\": "src"
+        }
+    }
+}
