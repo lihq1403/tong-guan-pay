@@ -65,7 +65,7 @@ class Pay
      * @return array
      * @throws HttpException
      */
-    public function qr($payMoney, $lowOrderId, $notifyUrl, $returnUrl = '', $body = '', $attach = '')
+    public function qr($payMoney, $lowOrderId, $notifyUrl, $returnUrl = '', $body = 'qr-pay', $attach = '')
     {
         $curl_data = [
             'account' => $this->config->get('account'),
