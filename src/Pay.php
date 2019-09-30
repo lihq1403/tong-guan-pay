@@ -128,7 +128,7 @@ class Pay
 
         try {
             $response = $this->post(self::$host[$this->config->get('mode', 'dev')].self::$api_route['wxJsPay'], [], ['json' => $curl_data]);
-            if (empty($response['status']) || $response['status'] !== 100 || empty($response['pay_url']) || empty($response['pay_info'])) {
+            if (empty($response['status']) || $response['status'] !== 100 || empty($response['pay_info'])) {
                 throw new HttpException('返回异常：'.$response['message'] ?? '未知错误');
             }
             return [
