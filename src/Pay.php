@@ -132,6 +132,7 @@ class Pay
                 throw new HttpException('返回异常：'.$response['message'] ?? '未知错误');
             }
             return [
+                'upOrderId' => $response['upOrderId'],
                 'pay_url' => $response['pay_url'],
                 'pay_info' => $response['pay_info'],
                 'sign' => $response['sign'] ?? '',
