@@ -29,6 +29,7 @@ class Pay
         'qrCodePay' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvYWxsUXJjb2RlUGF5',
         'orderQuery' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvb3JkZXJRdWVyeQ==',
         'reverse' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvcmV2ZXJzZQ==',
+        'wxJsPay' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvd3hKc3BheQ=='
     ];
 
     /**
@@ -52,6 +53,10 @@ class Pay
         self::$api_route['qrCodePay'] = base64_decode(self::$api_route['qrCodePay']);
         self::$api_route['orderQuery'] = base64_decode(self::$api_route['orderQuery']);
         self::$api_route['reverse'] = base64_decode(self::$api_route['reverse']);
+        self::$api_route['wxJsPay'] = base64_decode(self::$api_route['wxJsPay']);
+
+//        var_dump(self::$api_route);exit();
+
     }
 
     /**
@@ -87,6 +92,49 @@ class Pay
                 'codeUrl' => $response['codeUrl'],
                 'lowOrderId' => $lowOrderId,
                 'orderId' => $response['orderId'],
+            ];
+        } catch (\Exception $e) {
+            throw new HttpException($e->getMessage());
+        }
+    }
+
+    /**
+     * 小程序/公众号支付
+     * @param $type
+     * @param $openId
+     * @param $appId
+     * @param $payMoney
+     * @param $lowOrderId
+     * @param $notifyUrl
+     * @param string $returnUrl
+     * @param string $body
+     * @return array
+     * @throws HttpException
+     */
+    public function wxPay($type, $openId, $appId, $payMoney, $lowOrderId, $notifyUrl, $returnUrl = '', $body = 'wx-pay')
+    {
+        $curl_data = [
+            'account' => $this->config->get('account'),
+            'payMoney' => $payMoney,
+            'lowOrderId' => $lowOrderId,
+            'body' => $body,
+            'isMinipg' => $type, // 值为 1，表示小程序支付；不传或值不为 1，表示公众账号内支付
+            'notifyUrl' => $notifyUrl,
+            'returnUrl' => $returnUrl,
+            'openId' => $openId,
+            'appId' => $appId,
+        ];
+        $curl_data['sign'] = Sign::create($curl_data, $this->config->get('key'));
+
+        try {
+            $response = $this->post(self::$host[$this->config->get('mode', 'dev')].self::$api_route['wxJsPay'], [], ['json' => $curl_data]);
+            if (empty($response['status']) || $response['status'] !== 100 || empty($response['pay_url']) || empty($response['pay_info'])) {
+                throw new HttpException('返回异常：'.$response['message'] ?? '未知错误');
+            }
+            return [
+                'pay_url' => $response['pay_url'],
+                'pay_info' => $response['pay_info'],
+                'sign' => $response['sign'] ?? '',
             ];
         } catch (\Exception $e) {
             throw new HttpException($e->getMessage());
