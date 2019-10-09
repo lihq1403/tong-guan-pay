@@ -29,7 +29,8 @@ class Pay
         'qrCodePay' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvYWxsUXJjb2RlUGF5',
         'orderQuery' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvb3JkZXJRdWVyeQ==',
         'reverse' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvcmV2ZXJzZQ==',
-        'wxJsPay' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvd3hKc3BheQ=='
+        'wxJsPay' => 'L3RnUG9zcC9zZXJ2aWNlcy9wYXlBcGkvd3hKc3BheQ==',
+        'partialReverse' => 'L3RnUG9zcC9wYXlBcGkvcmV2ZXJzZS92Mg=='
     ];
 
     /**
@@ -54,6 +55,7 @@ class Pay
         self::$api_route['orderQuery'] = base64_decode(self::$api_route['orderQuery']);
         self::$api_route['reverse'] = base64_decode(self::$api_route['reverse']);
         self::$api_route['wxJsPay'] = base64_decode(self::$api_route['wxJsPay']);
+        self::$api_route['partialReverse'] = base64_decode(self::$api_route['partialReverse']);
 
 //        var_dump(self::$api_route);exit();
 
@@ -184,6 +186,34 @@ class Pay
         $curl_data['sign'] = Sign::create($curl_data, $this->config->get('key'));
         try {
             $response = $this->post(self::$host[$this->config->get('mode', 'dev')].self::$api_route['reverse'], [], ['json' => $curl_data]);
+            if (empty($response['status']) || $response['status'] !== 100) {
+                throw new HttpException('返回异常：'.$response['message'] ?? '未知错误');
+            }
+            return $response;
+        } catch (\Exception $e) {
+            throw new HttpException($e->getMessage());
+        }
+    }
+
+    /**
+     * 差额退款
+     * @param $lowRefundNo
+     * @param $upOrderId
+     * @param $refundMoney
+     * @return mixed|string
+     * @throws HttpException
+     */
+    public function partialReverse($lowRefundNo, $upOrderId, $refundMoney)
+    {
+        $curl_data = [
+            'account' => $this->config->get('account'),
+            'lowRefundNo' => $lowRefundNo,
+            'upOrderId' => $upOrderId,
+            'refundMoney' => sprintf("%.2f", $refundMoney)
+        ];
+        $curl_data['sign'] = Sign::create($curl_data, $this->config->get('key'));
+        try {
+            $response = $this->post(self::$host[$this->config->get('mode', 'dev')].self::$api_route['partialReverse'], [], ['json' => $curl_data]);
             if (empty($response['status']) || $response['status'] !== 100) {
                 throw new HttpException('返回异常：'.$response['message'] ?? '未知错误');
             }
