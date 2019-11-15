@@ -100,8 +100,8 @@ trait HttpRequest
     {
         return array_merge([
             'base_uri'        => property_exists($this, 'baseUri') ? $this->baseUri : '',
-            'timeout'         => property_exists($this, 'timeout') ? $this->timeout : 5.0,
-            'connect_timeout' => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
+            'timeout'         => property_exists($this, 'timeout') ? $this->timeout : 30.0,
+            'connect_timeout' => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 30.0,
         ], $this->httpOptions);
     }
 
