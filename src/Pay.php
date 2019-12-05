@@ -120,7 +120,7 @@ class Pay
             'payMoney' => $payMoney,
             'lowOrderId' => $lowOrderId,
             'body' => $body,
-            'isMinipg' => $type, // 值为 1，表示小程序支付；不传或值不为 1，表示公众账号内支付
+            'isMinipg' => (string)$type, // 值为 1，表示小程序支付；不传或值不为 1，表示公众账号内支付
             'notifyUrl' => $notifyUrl,
             'returnUrl' => $returnUrl,
             'openId' => $openId,
