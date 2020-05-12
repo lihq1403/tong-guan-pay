@@ -80,7 +80,7 @@ class Pay
             'lowOrderId' => $lowOrderId,
             'body' => $body,
             'attach' => $attach,
-            'notifyUrl' => $notifyUrl,
+            'notifyUrl' => $this->notifyUrlFilter($notifyUrl),
             'returnUrl' => $returnUrl,
         ];
         $curl_data['sign'] = Sign::create($curl_data, $this->config->get('key'));
@@ -121,7 +121,7 @@ class Pay
             'lowOrderId' => $lowOrderId,
             'body' => $body,
             'isMinipg' => (string)$type, // 值为 1，表示小程序支付；不传或值不为 1，表示公众账号内支付
-            'notifyUrl' => $notifyUrl,
+            'notifyUrl' => $this->notifyUrlFilter($notifyUrl),
             'returnUrl' => $returnUrl,
             'openId' => $openId,
             'appId' => $appId,
@@ -221,5 +221,16 @@ class Pay
         } catch (\Exception $e) {
             throw new HttpException($e->getMessage());
         }
+    }
+
+    /**
+     * 兼容回调
+     * @param $url
+     * @return string
+     */
+    public function notifyUrlFilter($url)
+    {
+        $url = parse_url($url);
+        return 'http://'.$url['host'].$url['path'];
     }
 }
